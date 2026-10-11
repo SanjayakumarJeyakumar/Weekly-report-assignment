@@ -1,133 +1,103 @@
-# Olist E-Commerce Marketplace: Weekly Business Review (WBR)
+# BDA Assignment: Olist E-Commerce Weekly Business Review
 
-An enterprise-grade Data Engineering and Analytics pipeline built on the Brazilian E-Commerce Public Dataset by Olist, deployed on **Supabase PostgreSQL** and orchestrated via **Python 3.10**.
+**Student Name:** Sanjayakumar Jeyakumar  
+**Roll No:** 46  
+**Course:** Big Data Analytics (BDA)  
+**Database:** PostgreSQL (Supabase)  
+**Language:** Python 3.10  
 
 ---
 
-## 1. Project Architecture & Repository Layout
+## Project Overview
+
+This project analyzes the Brazilian E-Commerce public dataset provided by Olist. The assignment covers:
+1. Building an ELT pipeline to process raw transactional data into clean staging tables and an analytical mart (`mart_order_summary`).
+2. Running data quality checks for referential integrity, duplicate records, and invalid values.
+3. Conducting SQL analysis on revenue growth, customer retention, top categories, and delivery performance.
+4. Generating visualizations and a 5-page PDF report.
+
+---
+
+## Project Structure
 
 ```
 olist-weekly-review/
-├── certs/
-│   └── prod-ca-2021.crt          # Official Supabase Root 2021 CA certificate (SSL validation)
-├── charts/                       # Generated business visualizations (300 DPI PNG)
+├── charts/                       # Generated analysis charts
 │   ├── 01_monthly_revenue_trend.png
 │   ├── 02_delivery_delay_vs_review_score.png
 │   ├── 03_repeat_purchase_rate.png
 │   └── 04_top_categories_and_rolling_orders.png
 ├── data/
-│   └── raw/                      # 9 Olist CSV source datasets
-├── report/                       # Executive deliverables
-│   ├── vp_executive_memo.md      # One-page executive memorandum for leadership
-│   └── olist_weekly_business_review.pdf # Executive 5-page PDF report
-├── sql/                          # Modular PostgreSQL transformation & analysis scripts
-│   ├── 01_create_staging.sql     # Staging transformations (Cleaned tables)
-│   ├── 02_create_mart.sql        # Analysis mart builder (1-to-1 order grain)
-│   ├── 03_data_quality_checks.sql# Part B Data Quality test suite (6 checks)
-│   ├── 04_monthly_revenue.sql    # Part C1: Monthly GMV & MoM growth (LAG)
-│   ├── 05_top_categories_by_state.sql # Part C2: Top categories by state (DENSE_RANK)
-│   ├── 06_rolling_7_day_orders.sql    # Part C3: 7-day rolling daily order avg
-│   ├── 07_repeat_purchase_rate.sql    # Part C4: Customer retention & repeat rate
-│   └── 08_delivery_delay_vs_reviews.sql# Part C5: Delivery delay vs review scores
-├── src/                          # Reusable Python modules
-│   ├── db.py                     # Safe SQLAlchemy connection pool & SSL config
-│   ├── test_connection.py        # Read-only Supabase connectivity test
-│   ├── pipeline.py               # Main ELT pipeline orchestrator
-│   ├── data_quality.py           # Standalone / integrated DQ test runner
-│   ├── generate_visualizations.py# Visual analytics generator (Matplotlib)
-│   └── generate_pdf_report.py    # Executive 5-page PDF report compiler
-├── .env.example                  # Environment variable reference template
-├── .gitignore                    # Excludes .env, caches, and virtual environments
-└── requirements.txt              # Pinned Python package dependencies
+│   └── raw/                      # Olist CSV dataset files
+├── report/
+│   └── olist_weekly_business_review.pdf # 5-page assignment report
+├── sql/                          # SQL transformation and analysis queries
+│   ├── 01_create_staging.sql
+│   ├── 02_create_mart.sql
+│   ├── 03_data_quality_checks.sql
+│   ├── 04_monthly_revenue.sql
+│   ├── 05_top_categories_by_state.sql
+│   ├── 06_rolling_7_day_orders.sql
+│   ├── 07_repeat_purchase_rate.sql
+│   └── 08_delivery_delay_vs_reviews.sql
+├── src/                          # Python scripts
+│   ├── db.py                     # Database connection helper
+│   ├── test_connection.py        # Connection test script
+│   ├── pipeline.py               # Data pipeline script
+│   ├── data_quality.py           # Data quality check runner
+│   ├── generate_visualizations.py# Matplotlib chart generator
+│   └── generate_pdf_report.py    # ReportLab PDF generator
+├── .env.example
+├── .gitignore
+└── requirements.txt
 ```
 
 ---
 
-## 2. Environment Setup & Windows Configuration
+## Setup & Execution
 
-### Prerequisites
-- Python 3.10+
-- Active Supabase PostgreSQL database project
-
-### Dependencies
-Install the required packages. Note: This project uses **`pg8000`** (a 100% pure-Python PostgreSQL DB-API driver) rather than native `psycopg2` binaries, ensuring full compatibility with Windows Application Control / AppLocker environments:
-
-```powershell
+### 1. Install Dependencies
+```
 pip install -r requirements.txt
 ```
 
-### Credentials Configuration
-Copy `.env.example` to `.env` in the project root:
-
-```powershell
-Copy-Item .env.example .env
+### 2. Configure Database Credentials
+Create a `.env` file from `.env.example` with your Supabase credentials:
 ```
-
-Populate your `.env` with discrete Supabase parameters:
-```env
-DB_HOST=db.[YOUR-PROJECT-REF].supabase.co
+DB_HOST=db.your-project.supabase.co
 DB_PORT=5432
 DB_NAME=postgres
 DB_USER=postgres
-DB_PASSWORD=your_database_password
+DB_PASSWORD=your_password
 DB_SSLMODE=require
 ```
-*(Note: `.env` is strictly excluded from version control via `.gitignore`)*.
+
+### 3. Run Pipeline and Generate Deliverables
+- **Test database connection:**
+  ```
+  python src/test_connection.py
+  ```
+
+- **Run pipeline and data quality checks:**
+  ```
+  python src/pipeline.py
+  ```
+
+- **Generate charts:**
+  ```
+  python src/generate_visualizations.py
+  ```
+
+- **Generate PDF report:**
+  ```
+  python src/generate_pdf_report.py
+  ```
 
 ---
 
-## 3. How to Run Each Phase
+## Summary of Findings
 
-### Step 1: Verify Database Connectivity (Read-Only)
-Inspects PostgreSQL engine version, schema catalog, and existing table row counts:
-```powershell
-python src/test_connection.py
-```
-
-### Step 2: Run the End-to-End ELT Pipeline (Part A & B)
-Executes pre-flight CSV validation, candidate staging build, candidate mart build, and the integrated Data Quality suite inside an atomic transaction:
-```powershell
-python src/pipeline.py
-```
-
-### Step 3: Run Standalone Data Quality Checks (Part B)
-Executes the 6 quality checks against live data without modifying tables:
-```powershell
-python src/data_quality.py
-```
-
-### Step 4: Run Analytical SQL Queries (Part C)
-All queries in `sql/` can be executed directly in the Supabase SQL Editor or tested via Python:
-```powershell
-python -c "from src.db import get_engine; from sqlalchemy import text; import pandas as pd; print(pd.read_sql(text(open('sql/04_monthly_revenue.sql').read()), get_engine().connect()).head())"
-```
-
-### Step 5: Regenerate Visualizations & PDF Report (Part D)
-Generate publication-quality charts and compile the executive 5-page PDF report:
-```powershell
-python src/generate_visualizations.py
-python src/generate_pdf_report.py
-```
-Output files:
-- Visualizations: `charts/*.png`
-- Executive Memo: `report/vp_executive_memo.md`
-- Multi-page PDF Report: `report/olist_weekly_business_review.pdf`
-
----
-
-## 4. Key Analytical Findings & Business Summary
-
-| Core Dimension | Metric / Metric Finding | Business Interpretation |
-| :--- | :---: | :--- |
-| **North Star GMV** | **R$ 13.22M Total GMV** | Scaled from pilot (Sep 2016) to peak of R$ 993k/mo (May 2018), stabilizing in Q3 2018. |
-| **Buyer Retention** | **3.04% Repeat Purchase Rate** | 92,102 out of 94,990 eligible buyers (96.96%) purchased once and never returned (leaky bucket). |
-| **Delivery Reliability** | **92.20% On-Time Delivery Rate** | Overall logistics performance is high, but tail delay severity is extreme (+11.8 days overdue). |
-| **Detractor Attribution** | **36.60% of 1-Star Orders Were Late** | Late orders arrived an average of **+12.36 days past promise date** (21.25 days total transit time). |
-| **Causation Nuance** | **63.40% of 1-Star Orders Were On-Time** | Proves delivery delay is not the sole cause; product quality, missing parts, and seller misrepresentation drive the remaining detractor volume. |
-
----
-
-## 5. Security & Safety Principles
-- **Idempotency**: All pipeline operations use candidate temporary table validation and atomic transaction swaps. Reruns produce identical results without duplicating data.
-- **Credential Hygiene**: Password credentials are URL-encoded in memory, masked in logs, and never committed to Git.
-- **Zero Cascading Drops**: Tables are safely preserved using `CREATE TABLE IF NOT EXISTS` and `TRUNCATE` inside transactions.
+- **Total GMV Revenue:** R$ 13.22M across the operational period, peaking in November 2017 (Black Friday) and May 2018.
+- **Repeat Purchase Rate:** 3.04% of customers placed more than one order, showing low retention and high reliance on new customer acquisition.
+- **Delivery Reliability:** 92.20% of orders were delivered on time. However, late orders experienced an average delay of +11.8 days.
+- **Impact on Customer Reviews:** While late delivery is a strong driver of 1-star reviews (36.6% of 1-star reviews had delayed delivery with an average delay of +12.3 days), 63.4% of 1-star reviews occurred on on-time orders, indicating issues related to product quality or expectations.

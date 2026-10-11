@@ -1,10 +1,3 @@
-"""Student PDF Report Generator for Olist Weekly Business Review (BDA Assignments).
-
-Written in simple, clear student language using ReportLab Platypus.
-Generates a clean, 5-page A4 report with plain white background, standard typography,
-accurate database metrics, clear charts, and no overflow.
-"""
-
 import sys
 from pathlib import Path
 from reportlab.lib.pagesizes import A4
@@ -21,7 +14,7 @@ from reportlab.platypus import (
 )
 from reportlab.lib.enums import TA_CENTER, TA_LEFT, TA_RIGHT
 from reportlab.pdfgen import canvas
-import pymupdf  # for layout validation
+import pymupdf
 
 PROJECT_ROOT = Path(__file__).resolve().parent.parent
 if str(PROJECT_ROOT) not in sys.path:
@@ -30,15 +23,13 @@ if str(PROJECT_ROOT) not in sys.path:
 CHARTS_DIR = PROJECT_ROOT / "charts"
 REPORT_DIR = PROJECT_ROOT / "report"
 
-# Page Dimensions (A4: 595.28 x 841.89 pt)
 PAGE_WIDTH, PAGE_HEIGHT = A4
-MARGIN = 40.0  # 40 pt margins
-USABLE_WIDTH = PAGE_WIDTH - (2 * MARGIN)    # 515.28 pt
-USABLE_HEIGHT = PAGE_HEIGHT - (2 * MARGIN)  # 761.89 pt
+MARGIN = 40.0
+USABLE_WIDTH = PAGE_WIDTH - (2 * MARGIN)
+USABLE_HEIGHT = PAGE_HEIGHT - (2 * MARGIN)
 
 
 class StudentCanvas(canvas.Canvas):
-    """Simple two-pass canvas for clear, student-style page numbering."""
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
@@ -61,19 +52,16 @@ class StudentCanvas(canvas.Canvas):
         self.setFont("Helvetica", 8.5)
         self.setFillColor(colors.HexColor("#4a5568"))
 
-        # Thin simple footer line
         self.setStrokeColor(colors.HexColor("#cbd5e0"))
         self.setLineWidth(0.6)
         self.line(MARGIN, 30, PAGE_WIDTH - MARGIN, 30)
 
-        # Footer text
         self.drawString(MARGIN, 20, "BDA Assignments — Weekly Business Review (Sanjayakumar Jeyakumar | Roll No: 46)")
         self.drawRightString(PAGE_WIDTH - MARGIN, 20, f"Page {self._pageNumber} of {page_count}")
         self.restoreState()
 
 
 def get_student_styles():
-    """Create clean, simple typography styles for a student assignment."""
     styles = getSampleStyleSheet()
 
     title_main = ParagraphStyle(
@@ -689,25 +677,11 @@ def generate_pdf_report() -> Path:
 
 
 def validate_pdf_pages(pdf_path: Path):
-    """Render every page of the PDF to image and check page count and layout."""
-    print(f"\nValidating rendered pages of {pdf_path.name}...")
     doc = pymupdf.open(str(pdf_path))
     page_count = len(doc)
-    print(f"Total Page Count: {page_count} (Requirement: <= 5 pages)")
-    assert page_count <= 5, f"ERROR: PDF page count ({page_count}) exceeds 5 pages!"
-    assert page_count == 5, f"WARNING: Expected exactly 5 pages, found {page_count}."
-
-    rendered_images_dir = REPORT_DIR / "rendered_pages"
-    rendered_images_dir.mkdir(parents=True, exist_ok=True)
-
-    for i, page in enumerate(doc, 1):
-        pix = page.get_pixmap(dpi=150)
-        img_out = rendered_images_dir / f"page_{i}.png"
-        pix.save(str(img_out))
-        print(f"  Page {i}: Rendered to {img_out.name} ({pix.width}x{pix.height} px, {img_out.stat().st_size:,} bytes)")
-
     doc.close()
-    print("All pages successfully rendered and inspected: EXACTLY 5 PAGES.")
+    print(f"Validated PDF: {page_count} pages.")
+    assert page_count == 5, f"Expected 5 pages, found {page_count}"
 
 
 if __name__ == "__main__":

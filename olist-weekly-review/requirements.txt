@@ -1,15 +1,8 @@
-# Core data processing & visualization
 pandas>=2.0.0
 matplotlib>=3.7.0
-
-# Database connectivity (Pure-Python PostgreSQL driver for SQLAlchemy)
 SQLAlchemy>=2.0.0
 pg8000>=1.30.0
-
-# Environment variable management & trusted CA bundle
 python-dotenv>=1.0.0
 certifi>=2024.0.0
-
-# PDF report generation and visual validation
 reportlab>=5.0.0
 pymupdf>=1.24.0

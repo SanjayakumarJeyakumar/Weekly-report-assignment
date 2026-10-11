@@ -1,24 +1,3 @@
--- ============================================================================
--- Query 2: Top 3 Product Categories by Customer State
--- File: sql/05_top_categories_by_state.sql
--- Description:
---   Ranks the top 3 product categories by GMV for each Brazilian customer state
---   using DENSE_RANK() window function.
---
--- Business Rules & Methodology:
---   1. Joins:
---      - staging.stg_order_items (item prices)
---      - staging.stg_orders (order eligibility)
---      - staging.stg_customers (customer_state)
---      - public.olist_products_dataset (product categories)
---      - public.product_category_name_translation (English translations)
---   2. Revenue Definition: Pure item price value (SUM(price)), strictly excluding freight.
---   3. Category Labeling: Prefers English translation, falling back to original Portuguese
---      or 'uncategorized' if undefined.
---   4. Excludes canceled and unavailable orders.
---   5. DENSE_RANK() partitions by customer_state and orders by total_revenue DESC.
--- ============================================================================
-
 WITH category_state_revenue AS (
     SELECT 
         c.customer_state,
@@ -34,7 +13,6 @@ WITH category_state_revenue AS (
         c.customer_state,
         COALESCE(t.product_category_name_english, p.product_category_name, 'uncategorized')
 ),
-
 ranked_categories AS (
     SELECT 
         customer_state,
@@ -46,7 +24,6 @@ ranked_categories AS (
         ) AS category_rank
     FROM category_state_revenue
 )
-
 SELECT 
     customer_state,
     category_rank,

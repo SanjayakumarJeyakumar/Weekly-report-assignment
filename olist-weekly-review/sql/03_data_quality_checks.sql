@@ -1,10 +1,3 @@
--- ============================================================================
--- Part B: Data Quality Checks Suite
--- Returns check_id, check_name, severity, failed_row_count, status, explanation
--- Implements robust NULL handling across all temporal, domain, and foreign key checks
--- ============================================================================
-
--- Check 1: Duplicate order IDs in the mart (Critical)
 SELECT
     1 AS check_id,
     'Duplicate Order IDs in Mart' AS check_name,
@@ -22,7 +15,6 @@ FROM (
 
 UNION ALL
 
--- Check 2: Null order IDs in the mart (Critical)
 SELECT
     2 AS check_id,
     'Null Order IDs in Mart' AS check_name,
@@ -35,7 +27,6 @@ WHERE order_id IS NULL
 
 UNION ALL
 
--- Check 3: Orders delivered before purchase timestamp or delivered with missing purchase timestamp (Critical)
 SELECT
     3 AS check_id,
     'Orders Delivered Before Purchase' AS check_name,
@@ -49,7 +40,6 @@ WHERE delivered_date IS NOT NULL
 
 UNION ALL
 
--- Check 4: Invalid review scores outside 1–5 range or null scores on submitted reviews (Critical)
 SELECT
     4 AS check_id,
     'Invalid Review Scores Outside 1-5' AS check_name,
@@ -62,7 +52,6 @@ WHERE review_score < 1 OR review_score > 5 OR review_score IS NULL
 
 UNION ALL
 
--- Check 5: Orders whose customer ID does not match a customer record or is null (Critical)
 SELECT
     5 AS check_id,
     'Orphan Orders Without Customer Record' AS check_name,
@@ -76,7 +65,6 @@ WHERE c.customer_id IS NULL OR o.customer_id IS NULL
 
 UNION ALL
 
--- Check 6: Payment total reconciliation vs item value + freight (Warning)
 SELECT
     6 AS check_id,
     'Payment Total Reconciliation Variance' AS check_name,

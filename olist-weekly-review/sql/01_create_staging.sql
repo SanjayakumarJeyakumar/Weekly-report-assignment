@@ -1,9 +1,5 @@
--- Phase 1 Staging: Safe transactional refresh via temporary candidate tables
--- Existing staging tables are NEVER emptied until candidate data is generated and validated
-
 CREATE SCHEMA IF NOT EXISTS staging;
 
--- 1. Ensure permanent staging tables exist with proper constraints
 CREATE TABLE IF NOT EXISTS staging.stg_orders (
     order_id TEXT PRIMARY KEY,
     customer_id TEXT,
@@ -38,7 +34,6 @@ CREATE TABLE IF NOT EXISTS staging.stg_reviews (
     review_score INTEGER
 );
 
--- 2. Build candidate replacement data in temporary tables for pre-validation
 DROP TABLE IF EXISTS tmp_stg_orders;
 CREATE TEMP TABLE tmp_stg_orders AS
 SELECT

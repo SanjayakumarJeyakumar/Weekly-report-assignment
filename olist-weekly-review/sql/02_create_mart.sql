@@ -1,6 +1,3 @@
--- Phase 2 Mart: Safe transactional refresh via temporary candidate table
--- public.mart_order_summary is NEVER emptied until candidate mart is generated and validated
-
 CREATE TABLE IF NOT EXISTS public.mart_order_summary (
     order_id TEXT PRIMARY KEY,
     customer_unique_id TEXT,
